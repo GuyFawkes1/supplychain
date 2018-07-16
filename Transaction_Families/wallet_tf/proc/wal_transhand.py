@@ -25,23 +25,27 @@ def _display(msg):
 
 	LOGGER.debug("+"+(length+2)*"-"+"+")
 
-
+# Transaction Handler class for the USER
 class WalTransHand(TransactionHandler):
 
+	# Returns the family name of the transaction family
 	@property
 	def family_name(self):
 		return 'wal'
 
+	# Returns the family version of the transaction family
 	@property
 	def family_versions(self):
 		return ['1.0']
 
+	# Returns the first 6 hexadcimal number of the transaction family
+	# To be used to create the state address
 	@property
 	def namespaces(self):
 		return [WAL_NAMESPACE]
 
-	#apply method will be called by the validator
-
+	# Apply method will be called by the validator(Inbuilt sawtooth framework)
+	# Action specified in the transaction parameter is applied and then added to the state
 	def apply(self,transaction,context):
 		header = transaction.header
 		signer = header.signer_public_key
@@ -49,8 +53,8 @@ class WalTransHand(TransactionHandler):
 		walpayload = WalPayload.from_bytes(transaction.payload)
 		walstate = WalState(context)
 
+		# If action is delete, state data of the user is retrieved froms state databse and deleted
 		if walpayload.action == 'delete':
-
 			pair = walstate.get_pair(walpayload.name)
 
 			if pair is None:
@@ -58,18 +62,20 @@ class WalTransHand(TransactionHandler):
 
 			walstate.delete_pair(walpayload.name)
 
+		# If action is create, an object of type Pair is created and put into the state database
 		elif walpayload.action == 'create' :
-			# if walstate.get_pair(walpayload.name) is not None:
-			# 	raise InvalidTransaction('Invalid Item Exists')
-			
-			try:
-				res = subprocess.check_call(['sawtooth','keygen',walpayload.name])
-			except:
-				pass
+			if walstate.get_pair(walpayload.name) is not None:
+				raise InvalidTransaction('Invalid Item Exists')
+			# try:
+			# 	# creates the key file 
+			# 	res = subprocess.check_call(['sawtooth','keygen',walpayload.name])
+			# except:
+			# 	pass
 
 			pair = Pair(name = walpayload.name,pubkey = walpayload.pubkey,prof = "X"*9)
 			walstate.set_pair(walpayload.name,pair)
 		
+		# If the action is profile, a profile pertaining to what checks can be administered by this user are created
 		elif walpayload.action == 'profile':
 			pair = walstate.get_pair(walpayload.name)
 

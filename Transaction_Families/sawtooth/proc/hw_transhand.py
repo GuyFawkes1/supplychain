@@ -28,7 +28,7 @@ class HwTransHand(TransactionHandler):
 		return [HW_NAMESPACE]
 
 	# Apply method will be called by the validator(Inbuilt sawtoth framework)
-	# Action specified within transaction argument is applied and added to the state. 
+	# Action specified in the transaction parameter is applied and then added to the state. 
 	# Context refers to a small piece of the state database
 	def apply(self,transaction,context):
 		header = transaction.header

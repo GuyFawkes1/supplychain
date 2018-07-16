@@ -2,7 +2,7 @@ from sawtooth_sdk.processor.exceptions import InvalidTransaction
 
 # Encrypted string from the transaction payload is decoded
 # Individual components from the decoded string are extracted
-# Individual methods return the attribute that is called by hw_transhand.py
+# Individual methods return the attributes that are called by hw_transhand.py
 
 class HwPayload(object):
 

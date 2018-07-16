@@ -21,7 +21,9 @@ def _make_hw_address(name):
 	return HW_NAMESPACE + \
 		hashlib.sha512(name.encode('utf-8')).hexdigest()[:64]
 
-# class for the item's individual state date
+# Item object that includes the item name, checks that have been completed 
+# the current users address and the previous users address
+# Individual state data stored in the items's state database is created via this object
 class Item(object):
 	def __init__(self,name,check,c_addr,p_addr):
 		self.name = name
@@ -29,7 +31,9 @@ class Item(object):
 		self.c_addr = c_addr
 		self.p_addr = p_addr
 
-# not item but for user 
+# User object that includes their name, profile (checks that can be completed by them)
+# and their public key
+# Individual state data stored in the user's state database is created via this object
 class Pair(object):
 	def __init__(self,name,pubkey,prof):
 		self.name = name
@@ -37,32 +41,39 @@ class Pair(object):
 		self.pubkey = pubkey
 
 
-# if any changes need 
-# receives the individual state data and either adds the new state data to the new state address
-# or replaces state data with the most current stuff 
+# Object parameter receives individual state data
+# Either adds new state data with a new state address to the state database
+# Or replaces existing state data at the state address with the most current data
+# Actions denoted by transactions are implemented here
 class HwState(object):
 	
 	TIMEOUT = 3
-
+	# context is given - current state relevant to the transaction processor 
+	# if you change anything to context it will eventually be changed in the main state
 	def __init__(self,context):
 		self._context = context
 		self._address_cache = {}
+		# addresses you have seen in this iteration of the script
 
-	# items is dictionary of key value pairs - key being the address and value being the state data
-	# there may be an exception where one address has data for two things - the if else handles that
+	# Deletes the instance of the item from the dictionary of state addresses to state data
 	def delete_item(self,item_name):
+		# Dictionary where keys are the state address and the value is the state data
 		items = self._load_items(item_name = item_name)
 
+		# There may be an exception where one address stores data for more than one item
+		# If this is the case, the dictionary of state addressses and remaining state data is restored
+		# Else the state address and state data is deleted
 		del items[item_name]
 		if items:
 			self._store_item(item_name,items = items)
 		else:
 			self._delete_item(item_name)
 
-	# used in transhand to retrieve public key
+	# Retrieves the public key for the user 
+	# This method is primarily used in hw_transhand
 	def get_pubkey(self,name):
 		key_address = _make_wal_address(name)
-		key_state_entry=self._context.get_state([key_address],timeout=self.TIMEOUT)
+		key_state_entry = self._context.get_state([key_address],timeout=self.TIMEOUT)
 		
 		if key_state_entry :
 			pubkey = self._deserialize_key(data=key_state_entry[0].data)
@@ -71,6 +82,8 @@ class HwState(object):
 			print("Reciever doesn't exist in the database")
 			return None
 
+	# Retrieves the profile of the user 
+	# Profile pertains to the checks a user is authorized to conduct
 	def get_prof(self,name):
 		key_address = _make_wal_address(name)
 		key_state_entry=self._context.get_state([key_address],timeout=self.TIMEOUT)
@@ -84,7 +97,7 @@ class HwState(object):
 			print("Reciever doesn't exist in the database")
 			return None
 
-	# puts individual state item into state database
+	# Sets the item to its corresponding state address
 	def set_item(self,item_name,item):
 		items = self._load_items(item_name= item_name)
 
@@ -92,11 +105,12 @@ class HwState(object):
 
 		self._store_item(item_name,items = items)
 
-	# retrieves individual state data from database
+	# Retrieves the individual state data from the state database
 	def get_item(self,item_name):
 		return self._load_items(item_name=item_name).get(item_name)
 
-	# puts back a dictionary of strings
+	# Serializes state data and stores the data with its corresponding
+	# state address in the state database
 	def _store_item(self,item_name,items):
 
 		address = _make_hw_address(item_name)
@@ -106,14 +120,20 @@ class HwState(object):
 		self._address_cache[address] = state_data
 		self._context.set_state({address: state_data},timeout=self.TIMEOUT)
 
+	# Deletes state data for an item and its state address from the state database
 	def _delete_item(self,item_name):
 		address = _make_hw_address(item_name)
 
 		self._context.delete_state([address],timeout=self.TIMEOUT)
 		self._address_cache[address] = None
 
+	
 	# gives all of the state addresses and corresponding state data
-	# if you want to fix two things being stored at the same address 
+	# if you want to fix two things being stored at the same address - fix this method
+
+	# Given an item name, retrieves the state data corresponding to that item
+	# If there is no state data corresponding to the state address of the given item 
+	# an empty dictionary is returned
 	def _load_items(self,item_name):
 		address = _make_hw_address(item_name)
 		if address in self._address_cache:
@@ -137,7 +157,8 @@ class HwState(object):
 
 		return items
 
-	# splits into individual components
+	# Takes serialized state data and decodes the data into a human readable form
+	# Deserialized data gives an object of type Item
 	def _deserialize(self,data):
 		items = {}
 		try:
@@ -150,6 +171,7 @@ class HwState(object):
 
 		return items
 
+	# Takes item data and serializes it to be stored in the state database
 	def _serialize(self, items):
 		item_strs =[]
 		for name,g in items.items():
