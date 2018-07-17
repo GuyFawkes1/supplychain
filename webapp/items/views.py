@@ -49,6 +49,8 @@ def index(request):
 
 	return render(request,'items/index.html', context)
 
+# contains all the transaction of the item 
+# populate the html for the details page for where the item is currently in detail.html
 def detail(request,itemname):
 	
 	if request.user.is_authenticated == False :
@@ -56,18 +58,17 @@ def detail(request,itemname):
 	url = random_server()
 
 
-	#find item uses state list
-	# finding the details of itemname in the state database 
+	# Find item uses state list
+	# Finding the details of itemname in the state database 
 	resp = finder_saw.find(itemname,'ubuntu',url)
 	
 
-	# nc_add is the human readable name
+	# nc_add is the human readable name of the current address
 	nc_add = finder_wal.query(resp[itemname].c_addr,'ubuntu',url)
 	# breaking apart the string with commas
 	user_profile = _deserialize_key(nc_add)
 
 	nc_add = user_profile.name
-
 
 	# finding the profile 
 
@@ -91,6 +92,9 @@ def detail(request,itemname):
 
 	return render(request,'items/detail.html',context)	
 
+
+# from the activity stream if you click on a user, you can see the things mike is currently in charge of
+# only current stuff since it is retreived from state data
 def user_detail (request,username):
 
 	if request.user.is_authenticated == False :
@@ -118,10 +122,8 @@ def user_detail (request,username):
 	return render(request,'items/user-detail.html', context)
 	
 
-
-
-
-
+# which check the user did before submitted 
+# and then sending that check number to the rest-api
 
 def checked(request,itemname):
 
@@ -131,7 +133,7 @@ def checked(request,itemname):
 
 	url = random_server()
 
-
+	# sends the transaction to the rest api (which eventually sends to validator and hw_transhand)
 	response_url = checks.check(itemname, request.user.username,request.POST['check'],request.user.username,url)
 
 	
@@ -262,9 +264,9 @@ def map(request):
 			nc_add = _deserialize_key(nc_add).name
 			resp[name] = Item(name,checks,nc_add,prev_add)
 			
-			try:
+			try: # iheld comes from models.py and signifies the number of items the user holds
 				usersdata[nc_add].iheld += 1
-			except:
+			except: # this happens the first time a user comes 
 				usersdata[nc_add] = userinfo(nc_add,float(locations[nc_add]['lat']),float(locations[nc_add]['longi']))
 		except:
 			pass	
@@ -274,12 +276,13 @@ def map(request):
 	context = {'resp' :resp , 'usersdata' : usersdata}
 	return render(request,'items/map.html', context)
 
-
+# create item page where you enter the name of the item and password
 class CreateItemView(View):
 
 	form_class = CreateItemForm
 	template_name = 'items/create.html'
 
+	# when create item button is clicked
 	def get(self,request):
 
 		if request.user.is_authenticated == False :
@@ -289,6 +292,10 @@ class CreateItemView(View):
 		return render(request,self.template_name,{'form' : form})
 
 
+	# when submit button is clicked
+	# password is the password of the user who logs in
+	# checking if the user is the same 
+	# url is url of the rest-api - forwards it to sawtooth from django
 	def post(self,request):
 		
 		if request.user.is_authenticated == False :
@@ -312,6 +319,7 @@ class CreateItemView(View):
 			return render(request,self.template_name,{'form' : form})
 #LOGIN Stuff
 
+# initial log in page
 class UserFormView(View):
 	
 	form_class = UserForm

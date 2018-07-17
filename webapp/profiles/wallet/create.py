@@ -12,6 +12,7 @@ def _get_keyfile(name):
 def add(name,adminname,url):
 	# url = 'http://127.0.0.1:8008'
 	try:
+		# Going to bash and creating the key file 
 		res = subprocess.check_call(['sawtooth','keygen',name])
 	except:
 		pass

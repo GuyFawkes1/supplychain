@@ -2,6 +2,7 @@ import hashlib
 import base64
 from base64 import b64encode
 import time
+import datetime
 import requests
 import yaml
 from sawtooth_signing import create_context
@@ -120,11 +121,12 @@ class WalClient:
 
 
 	def _send_wal_txn(self,name,action,pubkey,wait=None):
-
-		payload = ",".join([name,action,pubkey]).encode()
-
+		ts = time.time()
+		time_stamp = datetime.datetime.fromtimestamp(ts).strftime('%X %x')
+		payload = ",".join([name,action,pubkey,time_stamp]).encode()
 		address = self._get_address(name)
 		sec_address = self._get_address(pubkey)
+		
 		header = TransactionHeader(
 			signer_public_key = self._signer.get_public_key().as_hex(),
 			family_name = "wal",

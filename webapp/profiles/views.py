@@ -14,7 +14,7 @@ def random_server():
 	urls_list = { '1': 'http://127.0.0.1:8008','2': 'http://rest-api-0:8008' }
 	return urls_list['2']
 
-
+# all the users in the state database
 def index(request):
 	
 	if request.user.is_staff == False :
@@ -34,6 +34,7 @@ def index(request):
 
 	return render(request,'profiles/index.html', context)
 
+# history of all transactions the user has ever done 
 def detail(request,username):
 	
 	if request.user.is_staff == False :
@@ -47,7 +48,9 @@ def detail(request,username):
 
 
 
-
+# create a new user page 
+# admin - create user
+# add confirm password
 class CreateProfileView(View):
 
 	form_class = CreateProfileForm
