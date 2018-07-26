@@ -10,13 +10,15 @@ class WalPayload(object):
 
 		# Encoded string is decoded and split into its individual components
 		try:
-			name,action,pubkey,time_stamp = payload.decode().split(",")
+			name,action,pubkey,dept,role,time_stamp = payload.decode().split(",")
 		except ValueError:
 			raise InvalidTransaction("Invalid payload serialization")
 
 		self._name = name
 		self._action = action
 		self._pubkey = pubkey
+		self._dept = dept
+		self._role = role
 		self._time_stamp = time_stamp
 
 	# Returns the WalPayload class and its initialized fields
@@ -38,6 +40,15 @@ class WalPayload(object):
 	@property
 	def pubkey(self):
 		return self._pubkey
+
+	# Returns the dept the user is a part of
+	def dept(self):
+		return self._dept
+
+	# Returns the role of the user
+	@property
+	def role(self):
+		return self._role
 
 	# Returns the time stamp of the transaction 
 	@property
