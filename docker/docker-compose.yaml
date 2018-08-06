@@ -90,7 +90,7 @@ services:
     ports:
       - "4004"
     command: bash -c \ 
-             "git clone -b webapp-beta https://github.com/GuyFawkes1/supplychain.git  && /usr/bin/python3 supplychain/Transaction_Families/sawtooth/proc/main.py tcp://validator-0:4004 "
+             "git clone -b producttype_tf https://github.com/GuyFawkes1/supplychain.git  && /usr/bin/python3 supplychain/Transaction_Families/sawtooth/proc/main.py tcp://validator-0:4004 "
               
     stop_signal: SIGKILL
   
@@ -100,7 +100,7 @@ services:
     ports:
       - "4004"
     command: bash -c \ 
-             "git clone -b webapp-beta https://github.com/GuyFawkes1/supplychain.git  && /usr/bin/python3 supplychain/Transaction_Families/sawtooth/proc/main.py tcp://validator-0:4004 "
+             "git clone -b producttype_tf https://github.com/GuyFawkes1/supplychain.git  && /usr/bin/python3 supplychain/Transaction_Families/sawtooth/proc/main.py tcp://validator-0:4004 "
               
     stop_signal: SIGKILL
   
@@ -110,7 +110,7 @@ services:
     ports:
       - "4004"
     command: bash -c \ 
-             "git clone -b webapp-beta https://github.com/GuyFawkes1/supplychain.git  && /usr/bin/python3 supplychain/Transaction_Families/sawtooth/proc/main.py tcp://validator-0:4004 "
+             "git clone -b producttype_tf https://github.com/GuyFawkes1/supplychain.git  && /usr/bin/python3 supplychain/Transaction_Families/sawtooth/proc/main.py tcp://validator-0:4004 "
               
     stop_signal: SIGKILL
 
@@ -122,7 +122,7 @@ services:
     ports:
       - "4004"
     command: bash -c \ 
-              "git clone -b webapp-beta https://github.com/GuyFawkes1/supplychain.git  && /usr/bin/python3 supplychain/Transaction_Families/wallet_tf/proc/main.py tcp://validator-0:4004 "
+              "git clone -b producttype_tf https://github.com/GuyFawkes1/supplychain.git  && /usr/bin/python3 supplychain/Transaction_Families/wallet_tf/proc/main.py tcp://validator-0:4004 "
               
   validator-1:
     image: hyperledger/sawtooth-validator
@@ -179,7 +179,7 @@ services:
     ports:
       - "4004"
     command: bash -c \ 
-              "git clone -b webapp-beta https://github.com/GuyFawkes1/supplychain.git  && /usr/bin/python3 supplychain/Transaction_Families/sawtooth/proc/main.py tcp://validator-1:4004 "
+              "git clone -b producttype_tf https://github.com/GuyFawkes1/supplychain.git  && /usr/bin/python3 supplychain/Transaction_Families/sawtooth/proc/main.py tcp://validator-1:4004 "
               
     stop_signal: SIGKILL
 
@@ -189,7 +189,7 @@ services:
     ports:
       - "4004"
     command: bash -c \ 
-              "git clone -b webapp-beta https://github.com/GuyFawkes1/supplychain.git  && /usr/bin/python3 supplychain/Transaction_Families/wallet_tf/proc/main.py tcp://validator-1:4004 "
+              "git clone -b producttype_tf https://github.com/GuyFawkes1/supplychain.git  && /usr/bin/python3 supplychain/Transaction_Families/wallet_tf/proc/main.py tcp://validator-1:4004 "
               
     stop_signal: SIGKILL
 
@@ -202,7 +202,7 @@ services:
     labels:
       kompose.service.expose: "django-server-1"
     command: bash -c \
-              "git clone -b webapp-beta https://github.com/GuyFawkes1/supplychain.git  && python3 supplychain/webapp/manage.py runserver 0:8000"
+              "git clone -b producttype_tf https://github.com/GuyFawkes1/supplychain.git  && python3 supplychain/webapp/manage.py runserver 0:8000"
 
 
 
@@ -259,7 +259,7 @@ services:
     ports:
       - "4004"
     command: bash -c \ 
-              "git clone -b webapp-beta https://github.com/GuyFawkes1/supplychain.git  && /usr/bin/python3 supplychain/Transaction_Families/sawtooth/proc/main.py tcp://validator-2:4004 "
+              "git clone -b producttype_tf https://github.com/GuyFawkes1/supplychain.git  && /usr/bin/python3 supplychain/Transaction_Families/sawtooth/proc/main.py tcp://validator-2:4004 "
               
     stop_signal: SIGKILL
 
@@ -269,7 +269,7 @@ services:
     ports:
       - "4004"
     command: bash -c \ 
-              "git clone -b webapp-beta https://github.com/GuyFawkes1/supplychain.git  && /usr/bin/python3 supplychain/Transaction_Families/wallet_tf/proc/main.py tcp://validator-2:4004 "
+              "git clone -b producttype_tf https://github.com/GuyFawkes1/supplychain.git  && /usr/bin/python3 supplychain/Transaction_Families/wallet_tf/proc/main.py tcp://validator-2:4004 "
               
     stop_signal: SIGKILL
 
@@ -280,7 +280,7 @@ services:
     ports:
       - "4004"
     command: bash -c \ 
-              "git clone -b webapp-beta https://github.com/GuyFawkes1/supplychain.git  && /usr/bin/python3 supplychain/Transaction_Families/product-type-tf/proc/main.py tcp://validator-0:4004 "
+              "git clone -b producttype_tf https://github.com/GuyFawkes1/supplychain.git  && /usr/bin/python3 supplychain/Transaction_Families/product-type-tf/proc/main.py tcp://validator-0:4004 "
 
   ptypes-tp-1:
     image: isaacprasanth/supplychain-custom-saw
@@ -288,7 +288,7 @@ services:
     ports:
       - "4004"
     command: bash -c \ 
-              "git clone -b webapp-beta https://github.com/GuyFawkes1/supplychain.git  && /usr/bin/python3 supplychain/Transaction_Families/product-type-tf/proc/main.py tcp://validator-1:4004 "
+              "git clone -b producttype_tf https://github.com/GuyFawkes1/supplychain.git  && /usr/bin/python3 supplychain/Transaction_Families/product-type-tf/proc/main.py tcp://validator-1:4004 "
 
   ptypes-tp-2:
     image: isaacprasanth/supplychain-custom-saw
@@ -296,4 +296,4 @@ services:
     ports:
       - "4004"
     command: bash -c \ 
-              "git clone -b webapp-beta https://github.com/GuyFawkes1/supplychain.git  && /usr/bin/python3 supplychain/Transaction_Families/product-type-tf/proc/main.py tcp://validator-2:4004 "
+              "git clone -b producttype_tf https://github.com/GuyFawkes1/supplychain.git  && /usr/bin/python3 supplychain/Transaction_Families/product-type-tf/proc/main.py tcp://validator-2:4004 "
