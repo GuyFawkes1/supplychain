@@ -1,104 +1,115 @@
 import hashlib
 from sawtooth_sdk.processor.exceptions import InternalError
 
-WAL_NAMESPACE = hashlib.sha512('wal'.encode("utf-8")).hexdigest()[0:6]
+# 128-digit hexadecimal number for the first 6 digits of each transaction family is created
+# The first 6 digits from the number is extracted
+# This will correspond to the transaction family in the state adresss
+PTYPE_NAMESPACE = hashlib.sha512('ptype'.encode("utf-8")).hexdigest()[0:6]
 
-def _make_wal_address(name):
-	return WAL_NAMESPACE + \
+# Complete state address is created 
+# Using the 6 digits corresponding to transaction family 
+# And first 64 digits from the hexadecimal number for the item
+def _make_pt_address(name):
+	return PTYPE_NAMESPACE + \
 		hashlib.sha512(name.encode('utf-8')).hexdigest()[:64]
 
-class Pair(object):
-	def __init__(self,name,pubkey,prof):
-		self.name = name
-		self.pubkey = pubkey
-		self.prof = prof
+# Ptype object that contains the product type name, the role of the person 
+# who sent the transaction and the next person who will receive the transaction
+# and the checks that have been compeleted for the product type
+class Ptype(object):
+	def __init__(self, ptype_name, dept, role):
+		self.name = ptype_name # name of product type
+		self.dept = dept # dept for whose checks + roles have been administered 
+		self.role = role  # role that has been added 
 
-class WalState(object):
+	@property
+	def name(self):
+		return self.name
+
+	@property
+	def dept(self):
+		return self.dept
+
+	@property
+	def role(self):
+		return self.role
+
+
+class PtypeState(object):
 	TIMEOUT = 3
 	def __init__(self,context):
 		self._context = context
 		self._address_cache = {}
 
-	def delete_pair(self,pair_name):
-		pairs = self._load_pairs(pair_name= pair_name)
-
-		del pairs[pair_name]
-		if pairs:
-			self._store_pair(pair_name,pairs = pairs)
-		else:
-			self._delete_pair(pair_name)
-
-	def set_pair(self,pair_name,pair):
-		pairs = self._load_pairs(pair_name= pair_name)
-		pairs[pair_name] = pair
-		self._store_pair(pair_name,pairs = pairs)
-
-
-	def get_pair(self,pair_name):
-		return self._load_pairs(pair_name=pair_name).get(pair_name)
-
-	def _store_pair(self,pair_name,pairs):
-
-		address = _make_wal_address(pair_name)
-		sec_add = _make_wal_address(pairs[pair_name].pubkey)
-		state_data = self._serialize(pairs)
-		self._address_cache[address] = state_data
-		self._address_cache[sec_add] = state_data
-		self._context.set_state({address: state_data},timeout=self.TIMEOUT)
-		
-		#Unresolved issue when setting the profile... Leading to change of profile at only one state table
+	def _deserialize(self, data):
+		ptype = {}
 		try:
-			self._context.set_state({sec_add: state_data},timeout=self.TIMEOUT)
-		except:
-			pass
+			for types in data.decode().split("|"):
+				name, dept, role = types.split(",") # potential problem? splitting roles?
+				ptype[name] = Ptype(name, dept, role)
+		except ValueError:
+			raise InternalError("Failed to deserialize product type data")
+		return ptype
 
+	# fix! 
+	def _serialize(self, ptypes): 
+		ptype_strs = []
+		for name, g in ptypes.items(): 
+			if g.n_role == None:
+				g.n_role = 'none'
+			string = ",".join([name, g.role, g.checks])
 
+			ptype_strs.append(string)
+		return "|".join(sorted(ptype_strs)).encode()
 
-	def _delete_pair(self,pair_name):
-		address = _make_wal_address(pair_name)
-		self._context.delete_state([address],timeout=self.TIMEOUT)
-		self._address_cache[address] = None
-
-	def _load_pairs(self,pair_name):
-		address = _make_wal_address(pair_name)
+	def load_ptypes(self, ptype_name):
+		address = _make_pt_address(ptype_name)
 		if address in self._address_cache:
 			if self._address_cache[address]:
-				serialized_pairs = self._address_cache[address]
-				pairs = self._deserialize(serialized_pairs)
-			else:
-				pairs = {}
+				serialized_ptypes = self._address_cache[address]
+				ptypes = self._deserialize(serialized_ptypes)
+			else: 
+				ptypes = {}
 		else:
 			state_entries = self._context.get_state([address],timeout=self.TIMEOUT)
-			
-			if state_entries :
+			if state_entries:
 				self._address_cache[address] = state_entries[0].data
 				
-				pairs = self._deserialize(data=state_entries[0].data)
+				ptypes = self._deserialize(data=state_entries[0].data)
 
 			else:
 				self._address_cache[address] = None
-				pairs = {}
+				ptypes = {}
 
-		return pairs
+		return ptypes
 
-	def _deserialize(self,data):
-		pairs = {}
-		try:
-			for pair in data.decode().split("|"):
-				name,pubkey,prof = pair.split(",")
-				pairs[name] = Pair(name,pubkey,prof)
+	def get_ptype(self, ptype_name):
+		return self.load_ptypes(ptype_name = ptype_name).get(ptype_name)
 
-		except ValueError:
-			raise InternalError("Failed to deserialize pairs data")
+	def set_ptype(self, ptype_name, ptype):
+		ptypes = self.load_ptypes(ptype_name = ptype_name)
 
-		return pairs
+		ptypes[ptype_name] = ptype
+		self.store_ptype(ptype_name = ptype_name, ptype = ptypes)
 
-	def _serialize(self, pairs):
-		pair_strs =[]
-		for name,g in pairs.items():
-			pair_str = ",".join(
-				[name,g.pubkey,g.prof])
+	def store_ptype(self, ptype_name, ptype):
+		address = _make_pt_address(ptype_name)
+		state_data = self._serialize(ptype)
 
-			pair_strs.append(pair_str)
+		self._address_cache[address] = state_data
+		self._context.set_state({address: state_data}, timeout = self.TIMEOUT)
 
-		return "|".join(sorted(pair_strs)).encode()
+	def delete_ptype(self, ptype_name):
+		ptypes = self.load_ptypes(ptype_name = ptype_name)
+
+		del ptypes[ptype_name]
+		if ptypes:
+			self.store_ptype(ptype_name, ptypes)
+		else:
+			self._delete_ptype(ptype_name = ptype_name)
+	
+	def _delete_ptype(self, ptype_name):
+		address = _make_pt_address(ptype_name)
+
+		self._context.delete_state([address], timeout = self.TIMEOUT)
+		self._address_cache[address] = None

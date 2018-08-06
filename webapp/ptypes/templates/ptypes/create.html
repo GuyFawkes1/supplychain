@@ -1,0 +1,82 @@
+{% extends 'ptypes/base.html' %}
+{% block title %} Create Product Types {% endblock%}
+
+{% block body %}
+<div class="container-fluid">
+
+    <div class="row">
+        <div class="col-sm-12 col-md-6">
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    <h3>Create a Product Type</h3>
+                    {% if error_message %}
+                        <p><strong>{{ error_message }}</strong></p>
+                    {% endif %}
+                    <form class="form-horizontal" role="form" action="{% url 'ptypes:create'%}" method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <label class="control-label col-sm-2" for="id_itemname">
+                                New Product Type
+                            </label>
+                            <div class="col-sm-10">
+                                <input id="id_itemname" maxlength="30" name="username" type="text">
+                            </div>
+
+                            <label>
+                                Existing Product Types
+                            </label>
+                            <div>
+                                <select> 
+                                    <!-- replace this with django script that extracts current product types from the state -->
+                                   
+                                </select>
+                            </div>
+                        </div>
+                        
+
+                        <div class="form-group">
+                            <label class="control-label col-sm-2" for="id_rolename">
+                                New Role 
+                            </label>
+                            <div class="col-sm-10">
+                                <input id="id_rolename" maxlength="30" name="username" type="text">
+                            </div>
+
+                            <label>
+                                Existing Roles
+                            </label>
+                            <div>
+                                <select> 
+                                    <!-- replace this with django script that extracts current product types from the state -->
+                                   
+                                </select>
+                            </div>
+                        </div>
+
+
+                        <div class="form-group">
+                            <label class="control-label col-sm-2" for="id_checkname">
+                                New Check
+                            </label>
+                            <div class="col-sm-10">
+                                <input id="id_checkname" maxlength="30" name="username" type="text">
+                            </div>
+                        </div>
+    
+
+                        <div class="form-group">
+                            <div class="col-sm-offset-2 col-sm-10">
+                                <button type="submit" class="btn btn-success">Submit</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+
+{% endblock %}

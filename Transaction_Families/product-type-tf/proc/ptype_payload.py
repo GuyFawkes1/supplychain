@@ -5,12 +5,11 @@ class PtypePayload(object):
 	def __init__(self,payload):
 
 		try:
-			name, ptype, dept, role, check, action, time_stamp = payload.decode().split(",")
+			name, dept, role, check, action, time_stamp = payload.decode().split(",")
 		except ValueError:
 			raise InvalidTransaction("Invalid payload serialization")
 
 		self._name = name 
-		self._ptype = ptype
 		self._dept = dept
 		self._role = role 
 		self._check = check
@@ -21,15 +20,10 @@ class PtypePayload(object):
 	def from_bytes(payload):
 		return PtypePayload(payload=payload)
 
-	# Returns the name of the item 
+	# Returns the product type name of the item 
 	@property
 	def name(self):
 		return self._name
-
-	# Returns the product type name of the item
-	@property
-	def ptype(self):
-		return self._ptype
 
 	# Returns the department the user(admin) who made the transaction is in
 	@property

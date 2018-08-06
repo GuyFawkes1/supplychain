@@ -272,3 +272,28 @@ services:
               "git clone -b webapp-beta https://github.com/GuyFawkes1/supplychain.git  && /usr/bin/python3 supplychain/Transaction_Families/wallet_tf/proc/main.py tcp://validator-2:4004 "
               
     stop_signal: SIGKILL
+
+# new added 
+  ptypes-tp-0:
+    image: isaacprasanth/supplychain-custom-saw
+    container_name: ptypes-tp-default-0
+    ports:
+      - "4004"
+    command: bash -c \ 
+              "git clone -b webapp-beta https://github.com/GuyFawkes1/supplychain.git  && /usr/bin/python3 supplychain/Transaction_Families/product-type-tf/proc/main.py tcp://validator-0:4004 "
+
+  ptypes-tp-1:
+    image: isaacprasanth/supplychain-custom-saw
+    container_name: ptypes-tp-default-1
+    ports:
+      - "4004"
+    command: bash -c \ 
+              "git clone -b webapp-beta https://github.com/GuyFawkes1/supplychain.git  && /usr/bin/python3 supplychain/Transaction_Families/product-type-tf/proc/main.py tcp://validator-1:4004 "
+
+  ptypes-tp-2:
+    image: isaacprasanth/supplychain-custom-saw
+    container_name: ptypes-tp-default-2
+    ports:
+      - "4004"
+    command: bash -c \ 
+              "git clone -b webapp-beta https://github.com/GuyFawkes1/supplychain.git  && /usr/bin/python3 supplychain/Transaction_Families/product-type-tf/proc/main.py tcp://validator-2:4004 "

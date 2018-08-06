@@ -9,7 +9,9 @@ def _get_keyfile(name):
 
 	return '{}/{}.priv'.format(key_dir, username)
 
-def add(name,adminname,url):
+
+# dept will come as an argument from views.py
+def add(name,adminname,dept,url):
 	# url = 'http://127.0.0.1:8008'
 	try:
 		# Going to bash and creating the key file 
@@ -22,7 +24,9 @@ def add(name,adminname,url):
 	admin_client = WalClient(base_url=url,keyfile=keyfile_admin)
 	client = WalClient(base_url=url,keyfile = keyfile_u)
 
-	response = admin_client.create(name=name,pubkey=client._signer.get_public_key().as_hex())
+	#response = admin_client.create(name=name,pubkey=client._signer.get_public_key().as_hex())
+	response = admin_client.create(name=name, pubkey=client._signer.get_public_key().as_hex(), dept=dept)
+
 
 	print("response: {}".format(response))
 

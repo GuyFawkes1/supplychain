@@ -85,7 +85,7 @@ def detail(request,itemname):
 
 	# looks through all the transactions to find history
 	hist= his.item_history(itemname,url)
-	
+
 
 	# submit button is only shown in the current address of the item is the same as the current user of the page. 
 	context = {'resp' :resp,'hist' : hist , "checks_list" : checks_list , 'requested_user':requested_user }
@@ -332,7 +332,7 @@ class UserFormView(View):
 	def post(self,request):
 		form = self.form_class(request.POST)
 		username = request.POST['username']
-		password  =request.POST['password']
+		password =request.POST['password']
 		user = authenticate(username=username,password=password)
 
 		if user is not None:
@@ -384,4 +384,3 @@ def _deserialize_key(data):
 
 		return user_profile 
 		
-

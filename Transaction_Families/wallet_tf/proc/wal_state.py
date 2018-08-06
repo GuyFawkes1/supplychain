@@ -11,11 +11,11 @@ def _make_wal_address(name):
 # and their public key
 # Individual state data stored in the user's state database is created via this object
 class Pair(object):
-	def __init__(self,name,pubkey,prof,role):
+	def __init__(self,name,pubkey,prof,dept):
 		self.name = name
 		self.pubkey = pubkey
 		self.prof = prof
-		self.role = role
+		self.dept = dept
 
 # Object parameter receives individual state data
 # Either adds new state data with a new state address to the state database
@@ -102,8 +102,8 @@ class WalState(object):
 		pairs = {}
 		try:
 			for pair in data.decode().split("|"):
-				name,pubkey,prof,role = pair.split(",")
-				pairs[name] = Pair(name,pubkey,prof,role)
+				name,pubkey,prof,dept = pair.split(",")
+				pairs[name] = Pair(name,pubkey,prof,dept)
 
 		except ValueError:
 			raise InternalError("Failed to deserialize pairs data")
@@ -115,7 +115,7 @@ class WalState(object):
 		pair_strs =[]
 		for name,g in pairs.items():
 			pair_str = ",".join(
-				[name,g.pubkey,g.prof,g.role])
+				[name,g.pubkey,g.prof,g.dept])
 
 			pair_strs.append(pair_str)
 

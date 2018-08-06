@@ -66,22 +66,24 @@ class CreateProfileView(View):
 
 
 	def post(self,request):
-		
+
 		if request.user.is_staff == False :
 			return redirect('items:login')
 		url = random_server()
 		form = CreateProfileForm(request.POST)
-		
+
 		if form.is_valid():
 			user = form.save(commit=False)
 			username = form.cleaned_data['username']
 			password = form.cleaned_data['password']
+			dept = form.cleaned_data['dept']
+
 			
 			user.set_password(password)
 			user.save()
-			create_wal.add(username,request.user.username,url)
+			create_wal.add(username,request.user.username,dept,url) 
 			df_profs = role_defs.role_prof(username)
-			profile.prof(username,df_profs,request.user.username,url)
+			profile.prof(username,df_profs,request.user.username,dept,url)
 
 			return redirect('profiles:home')
 		else:

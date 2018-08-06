@@ -85,7 +85,6 @@ class HwClient:
 		item_address = _sha512(name.encode('utf-8'))[0:64]
 		return hw_prefix + item_address
 
-
 	def _get_key_address(self,name):
 		wal_prefix =  _sha512('wal'.encode('utf-8'))[0:6]
 		key_address = _sha512(name.encode('utf-8'))[0:64]

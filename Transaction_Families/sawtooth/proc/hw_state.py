@@ -35,10 +35,11 @@ class Item(object):
 # and their public key
 # Individual state data stored in the user's state database is created via this object
 class Pair(object):
-	def __init__(self,name,pubkey,prof):
+	def __init__(self,name,pubkey,prof, role):
 		self.name = name
 		self.prof = prof
 		self.pubkey = pubkey
+		self.role = role
 
 
 # Object parameter receives individual state data
@@ -188,8 +189,8 @@ class HwState(object):
 		pairs = {}
 		try:
 			for pair in data.decode().split("|"):
-				name,pubkey,profile = pair.split(",") # comma is delimiter 
-				pairs[name] = Pair(name,pubkey,profile)
+				name,pubkey,profile,role = pair.split(",") # comma is delimiter 
+				pairs[name] = Pair(name,pubkey,profile,role)
 
 		except ValueError:
 			raise InternalError("Failed to deserialize pairs data")

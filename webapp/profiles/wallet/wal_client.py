@@ -47,15 +47,15 @@ class WalClient:
 			.new_signer(private_key)
 
 
-	def create(self,name,pubkey,wait=None):
+	def create(self,name,pubkey,dept,wait=None): 
 		
-		return self._send_wal_txn(name,"create",pubkey = pubkey,wait = wait)
+		return self._send_wal_txn(name,"create",pubkey = pubkey,dept = dept,wait = wait)
 
-	def delete(self,name,pubkey,wait=None):
-		return self._send_wal_txn(name,"delete",pubkey = pubkey,wait = wait)
+	def delete(self,name,pubkey,dept,wait=None):
+		return self._send_wal_txn(name,"delete",pubkey = pubkey,dept = dept,wait = wait)
 
-	def prof(self,name,profile,wait = None):
-		return self._send_wal_txn(name,"profile",pubkey = profile,wait = wait)
+	def prof(self,name,profile,dept,wait = None):
+		return self._send_wal_txn(name,"profile",pubkey = profile,dept = dept,wait = wait)
 
 
 
@@ -120,10 +120,10 @@ class WalClient:
 		return result.text
 
 
-	def _send_wal_txn(self,name,action,pubkey,wait=None):
+	def _send_wal_txn(self,name,action,pubkey,dept,wait=None):
 		ts = time.time()
 		time_stamp = datetime.datetime.fromtimestamp(ts).strftime('%X %x')
-		payload = ",".join([name,action,pubkey,time_stamp]).encode()
+		payload = ",".join([name,action,pubkey,dept,time_stamp]).encode()
 		address = self._get_address(name)
 		sec_address = self._get_address(pubkey)
 		

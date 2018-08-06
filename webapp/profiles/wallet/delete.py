@@ -12,12 +12,15 @@ def _get_keyfile(usrname):
 
 #delete is gonna dance
 #check for admin previlages
-def delete(u_name,adminname):
+def delete(u_name,adminname, dept):
 	url = 'http://127.0.0.1:8008'
 	keyfile_u = _get_keyfile(u_name)
 	keyfile_a = _get_keyfile(adminname)
 	client = WalClient(base_url=url,keyfile = keyfile_u)
 	admin_client = _get_keyfile(adminname)
-	response = admin_client.delete(name=u_name,pubkey = client._signer.get_public_key().as_hex())
+	#response = admin_client.delete(name=u_name,pubkey = client._signer.get_public_key().as_hex(),dept=dept))
+	response = client.delete(name=u_name, pubkey = client._signer.get_public_key().as_hex(), dept = dept)
 
 	print("response: {}".format(response))
+
+# error? replapce admin_client with client and return the response

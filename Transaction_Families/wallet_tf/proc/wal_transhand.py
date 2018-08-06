@@ -72,7 +72,7 @@ class WalTransHand(TransactionHandler):
 			# except:
 			# 	pass
 
-			pair = Pair(name = walpayload.name,pubkey = walpayload.pubkey,prof = "X"*9,role = walpayload.role)
+			pair = Pair(name = walpayload.name,pubkey = walpayload.pubkey,prof = "X"*9,dept = walpayload.dept)
 			walstate.set_pair(walpayload.name,pair)
 		
 		# If the action is profile, a profile pertaining to what checks can be administered by this user are created
@@ -82,6 +82,6 @@ class WalTransHand(TransactionHandler):
 			if pair is None:
 				raise InvalidTransaction('Invalid Action')
 
-			new_pair = Pair(name=walpayload.name,pubkey = pair.pubkey,prof = walpayload.pubkey,role = walpayload.role)
+			new_pair = Pair(name=walpayload.name,pubkey = pair.pubkey,prof = walpayload.pubkey,dept = walpayload.dept)
 		
 			walstate.set_pair(walpayload.name,new_pair)

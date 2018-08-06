@@ -1,3 +1,7 @@
+# In the entire item state database if the user exists, 
+# what other items are currently stored with that user
+# The response is returned to views.py (line 37?)
+
 import os
 from .hw_client import HwClient
 from ..models import Item
