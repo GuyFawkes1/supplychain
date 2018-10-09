@@ -59,15 +59,15 @@ class WalTransHand(TransactionHandler):
 			walstate.delete_pair(walpayload.name)
 
 		elif walpayload.action == 'create' :
-			'''if walstate.get_pair(walpayload.name) is not None:
-				raise InvalidTransaction('Invalid Item Exists')
-'''			
+			# if walstate.get_pair(walpayload.name) is not None:
+			# 	raise InvalidTransaction('Invalid Item Exists')
+			
 			try:
 				res = subprocess.check_call(['sawtooth','keygen',walpayload.name])
 			except:
 				pass
 
-			pair = Pair(name = walpayload.name,pubkey = walpayload.pubkey,prof = "X"*5)
+			pair = Pair(name = walpayload.name,pubkey = walpayload.pubkey,prof = "X"*9)
 			walstate.set_pair(walpayload.name,pair)
 		
 		elif walpayload.action == 'profile':
@@ -77,5 +77,5 @@ class WalTransHand(TransactionHandler):
 				raise InvalidTransaction('Invalid Action')
 
 			new_pair = Pair(name=walpayload.name,pubkey = pair.pubkey,prof = walpayload.pubkey)
-			print(new_pair)
+		
 			walstate.set_pair(walpayload.name,new_pair)

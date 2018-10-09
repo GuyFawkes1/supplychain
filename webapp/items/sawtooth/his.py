@@ -32,6 +32,7 @@ def item_history(name,url):
 	url = url + '/transactions'
 	
 	r = requests.get(url=url)
+	
 	alltrans = r.json()
 	address = make_item_address(name)
 	j = 0

@@ -20,8 +20,6 @@ def query(name,usrname,url):
 	# url = 'http://127.0.0.1:8008'
 	keyfile = _get_keyfile(usrname)
 	client = WalClient(base_url=url,keyfile = keyfile)
-	print(name)
-
 	response = client.show(name=name)
 	return response
 

@@ -10,12 +10,12 @@ def _get_keyfile(usrname):
 
 #delete is not updated because it doesnt have aplace in UI need to update it.
 
-def delete(name,usrname,url):
+def delete(name,cu_add,usrname,url):
 	#url = 'http://127.0.0.1:8008'
 	keyfile = _get_keyfile(usrname)
 	client = HwClient(base_url=url,keyfile = keyfile)
 
-	response = client.delete(name=name)
+	response = client.delete(name=name,cu_add =cu_add)
 	return response
 	
 

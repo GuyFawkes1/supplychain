@@ -43,7 +43,7 @@ class HwTransHand(TransactionHandler):
 
 			if hwstate.get_item(hwpayload.name) is not None:
 				raise InvalidTransaction('Invalid Item Exists')
-			item = Item(name = hwpayload.name,check = "-" * 4 ,
+			item = Item(name = hwpayload.name,check = "-" * 9,
 						c_addr = signer , p_addr = None)
 			hwstate.set_item(hwpayload.name,item)
 			
@@ -78,7 +78,7 @@ class HwTransHand(TransactionHandler):
 				raise InvalidTransaction('Invalid Item does not exist')
 
 
-			new_c = list("-"*4)
+			new_c = list("-"*9)
 			for i in range(0,len(item.check)):
 				if i != cno-1:
 					new_c[i] = item.check[i] 

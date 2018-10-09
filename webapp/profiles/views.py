@@ -4,7 +4,7 @@ from django.contrib.auth import authenticate, login , logout
 from django.views import View
 import json
 from .wallet import create as create_wal
-from .wallet import finder
+from .wallet import finder,profile,role_defs
 from .forms import CreateProfileForm
 from .models import Pair
 
@@ -77,27 +77,14 @@ class CreateProfileView(View):
 			user.set_password(password)
 			user.save()
 			create_wal.add(username,request.user.username,url)
+			df_profs = role_defs.role_prof(username)
+			profile.prof(username,df_profs,request.user.username,url)
+
 			return redirect('profiles:home')
 		else:
 			return redirect('profiles:create')
 
 
+	
+		
 
-        
-
-
-		# new_username = request.POST['username']
-		# username = request.user.username
-		# password  =request.POST['password']
-
-
-
-		# if user is not None:
-		# 	response = create_saw.cr(itemname,username,url)
-		# 	print(response)
-		# 	#time.sleep(1.5)
-		# 	return redirect('items:index')
-		# else:
-		# 	#retry password
-		# 	form = self.form_class(None)
-		# 	return render(request,self.template_name,{'form' : form})

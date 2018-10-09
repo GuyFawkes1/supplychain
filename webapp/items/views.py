@@ -2,11 +2,11 @@ from django.shortcuts import render,redirect
 from django.http import Http404
 from django.contrib.auth import authenticate, login , logout
 from .sawtooth import querying
-from .sawtooth import send
+from .sawtooth import send as send_saw
 from .sawtooth import create as create_saw
 from .sawtooth import finder as finder_saw
 from .sawtooth import his
-from .sawtooth import checks
+from .sawtooth import checks,forwarding
 from profiles.wallet import finder as finder_wal
 from .forms import UserForm,SendItemForm
 from .forms import CreateItemForm
@@ -43,7 +43,7 @@ def index(request):
 		#finding out human name of the public key holder
 		nc_add = finder_wal.query(item_obj.c_addr,request.user.username,url)
 		nc_add = _deserialize_key(nc_add)
-		resp[name].c_addr = nc_add
+		resp[name].c_addr = nc_add.name
 
 	context = {'resp' :resp, 'username' : request.user.username,'flag' : flag}
 
@@ -61,10 +61,15 @@ def detail(request,itemname):
 	
 	#######VERY IMPOSRTANT CHANGE TO BE APPLIED HERE TOOO
 	nc_add = finder_wal.query(resp[itemname].c_addr,'ubuntu',url)
-	nc_add = _deserialize_key(nc_add)
+	user_profile = _deserialize_key(nc_add) 
+	nc_add = user_profile.name
+	print("NC-ADD")
+	print(nc_add)
+	user_profile = finder_wal.query(nc_add,'ubuntu',url)
+	user_profile = _deserialize_key(user_profile)
 	resp[itemname].c_addr = nc_add
 	#get the checks list
-	checks_list = checks.item_checks_list(resp[itemname].check)
+	checks_list = checks.item_checks_list(check_status = resp[itemname].check,profile =user_profile.profile)
 	#hist goes through transactions in block chain, so returns in human readble form
 	
 	#serialized make that into an item history class with all the attributes so that django 
@@ -72,8 +77,9 @@ def detail(request,itemname):
 	#we can do the serializtion and breaking up stuff in the his.py
 	hist= his.item_history(itemname,url)
 	requested_user = request.user.username
+	
 
-	context = {'resp' :resp,'hist' : hist , "checks_list" : checks_list , 'requested_user':requested_user}
+	context = {'resp' :resp,'hist' : hist , "checks_list" : checks_list , 'requested_user':requested_user }
 	return render(request,'items/detail.html',context)	
 
 def user_detail (request,username):
@@ -94,7 +100,7 @@ def user_detail (request,username):
 		#finding out human name of the public key holder
 		######HERE TOOOO
 		nc_add = finder_wal.query(item_obj.c_addr,request.user.username,url)
-		nc_add = _deserialize_key(nc_add)
+		nc_add = _deserialize_key(nc_add).name
 		resp[name].c_addr = nc_add
 
 
@@ -123,65 +129,105 @@ def checked(request,itemname):
 	resp = finder_saw.find(itemname,'ubuntu',url)
 	
 	nc_add = finder_wal.query(resp[itemname].c_addr,'ubuntu',url)
-	nc_add = _deserialize_key(nc_add)
+	user_profile = _deserialize_key(nc_add) 
+	nc_add = user_profile.name
+	user_profile = finder_wal.query(nc_add,'ubuntu',url)
+	user_profile = _deserialize_key(user_profile)
 	resp[itemname].c_addr = nc_add
 	#get the checks list
-	checks_list = checks.item_checks_list(resp[itemname].check)
+	checks_list = checks.item_checks_list(resp[itemname].check,user_profile.profile)
 	#hist goes through transactions in BC, so returns in human readble form
 	hist= his.item_history(itemname,url)
 	requested_user = request.user.username
 	context = {'resp' :resp,'hist' : hist , "checks_list" : checks_list,'requested_user':requested_user}
 	return render(request,'items/detail.html',context)
 
-class SendItem(View):
-	form_class = SendItemForm
-	template_name = 'items/send.html'
+# class SendItem(View):
+# 	form_class = SendItemForm
+# 	template_name = 'items/send.html'
 
-	def get(self,request,itemname):
+# 	def get(self,request,itemname):
 
-		if request.user.is_authenticated == False :
-			return redirect('items:login')
+# 		if request.user.is_authenticated == False :
+# 			return redirect('items:login')
 
-		url = random_server()
-		form = self.form_class(None)
-		#can change 'ubuntu' to 'requested user'
-		resp = finder_saw.find(itemname,'ubuntu',url)
+# 		url = random_server()
+# 		form = self.form_class(None)
+# 		#can change 'ubuntu' to 'requested user'
+# 		resp = finder_saw.find(itemname,'ubuntu',url)
 	
-		nc_add = finder_wal.query(resp[itemname].c_addr,'ubuntu',url)
-		nc_add = _deserialize_key(nc_add)
-		resp[itemname].c_addr = nc_add
-		#get the checks list
-		checks_list = checks.item_checks_list(resp[itemname].check)
-		#hist goes through transactions in block chain, so returns in human readble form
+# 		nc_add = finder_wal.query(resp[itemname].c_addr,'ubuntu',url)
+# 		user_profile = _deserialize_key(nc_add) 
+# 		nc_add = user_profile.name
+# 		user_profile = finder_wal.query(nc_add,'ubuntu',url)
+# 		user_profile = _deserialize_key(user_profile)
+# 		resp[itemname].c_addr = nc_add
+# 		#get the checks list
+# 		checks_list = checks.item_checks_list(resp[itemname].check,user_profile.profile)
+# 		#hist goes through transactions in block chain, so returns in human readble form
 		
-		#serialized make that into an item history class with all the attributes so that django 
-		#will not complain
-		#we can do the serializtion and breaking up stuff in the his.py
-		hist= his.item_history(itemname,url)
-		requested_user = request.user.username
+# 		#serialized make that into an item history class with all the attributes so that django 
+# 		#will not complain
+# 		#we can do the serializtion and breaking up stuff in the his.py
+# 		hist= his.item_history(itemname,url)
+# 		requested_user = request.user.username
 
-		context = {'form' : form,'itemname' : itemname ,'resp' :resp,'hist' : hist , "checks_list" : checks_list , 'requested_user':requested_user}
+# 		context = {'form' : form,'itemname' : itemname ,'resp' :resp,'hist' : hist , "checks_list" : checks_list , 'requested_user':requested_user}
 
-		return render(request,self.template_name,context)
+# 		return render(request,self.template_name,context)
 
-	def post(self,request,itemname):
+# 	def post(self,request,itemname):
 
-		if request.user.is_authenticated == False :
-			return redirect('items:login')
-		url = random_server()
-		recv = request.POST['recv']
-		# username = request.user.username
-		# password  =request.POST['password']
-		# user = authenticate(username=username,password=password)
-		user = request.user.username
-		if user is not None:
-			send.snd(itemname,recv,request.user.username,url) 
-			#time.sleep(1.5)
-			return redirect('items:index')
-		else:
-			#retry password
-			form = self.form_class(None)
-			return render(request,self.template_name,{'form' : form})
+# 		if request.user.is_authenticated == False :
+# 			return redirect('items:login')
+# 		url = random_server()
+# 		# username = request.user.username
+# 		# password  =request.POST['password']
+# 		# user = authenticate(username=username,password=password)
+# 		user = request.user.username
+# 		if user is not None:
+# 			send.snd(itemname,forwarding.from_user(request.user.username),request.user.username,url) 
+# 			#time.sleep(1.5)
+# 			return redirect('items:index')
+# 		else:
+# 			#retry password
+# 			form = self.form_class(None)
+# 			return render(request,self.template_name,{'form' : form})
+
+
+def send(request,itemname):
+	
+	if request.user.is_authenticated == False :
+		return redirect('items:login')
+	url = random_server()
+
+	send_saw.snd(itemname,forwarding.from_user(request.user.username),request.user.username,url)
+
+	#find item uses state list 
+	resp = finder_saw.find(itemname,'ubuntu',url)
+	
+	#######VERY IMPOSRTANT CHANGE TO BE APPLIED HERE TOOO
+	nc_add = finder_wal.query(resp[itemname].c_addr,'ubuntu',url)
+	user_profile = _deserialize_key(nc_add) 
+	nc_add = user_profile.name
+	user_profile = finder_wal.query(nc_add,'ubuntu',url)
+	user_profile = _deserialize_key(user_profile)
+	resp[itemname].c_addr = nc_add
+	#get the checks list
+	checks_list = checks.item_checks_list(check_status = resp[itemname].check,profile =user_profile.profile)
+	#hist goes through transactions in block chain, so returns in human readble form
+	
+	#serialized make that into an item history class with all the attributes so that django 
+	#will not complain
+	#we can do the serializtion and breaking up stuff in the his.py
+	hist= his.item_history(itemname,url)
+	requested_user = request.user.username
+
+	
+
+	context = {'resp' :resp,'hist' : hist , "checks_list" : checks_list , 'requested_user':requested_user,'sent_to':forwarding.from_user(request.user.username) }
+	return render(request,'items/send.html',context)	
+
 
 
 
@@ -204,7 +250,7 @@ def map(request):
 		name,checks,c_add,prev_add = response[s].decode().split(",")
 		try:
 			nc_add = finder_wal.query(c_add,'ubuntu',url)
-			nc_add = _deserialize_key(nc_add)
+			nc_add = _deserialize_key(nc_add).name
 			resp[name] = Item(name,checks,nc_add,prev_add)
 			
 			try:
@@ -212,8 +258,8 @@ def map(request):
 			except:
 				usersdata[nc_add] = userinfo(nc_add,float(locations[nc_add]['lat']),float(locations[nc_add]['longi']))
 		except:
-			pass
-	
+			pass	
+
 
 	
 	context = {'resp' :resp , 'usersdata' : usersdata}
@@ -294,24 +340,31 @@ class Item(object):
 		self.check = check
 		self.c_addr = c_addr
 		self.p_addr = p_addr
+class User_Profile(object):
+	def __init__(self,name,pubkey,profile):
+		self.name = name
+		self.pubkey = pubkey
+		self.profile = profile
 
 
-def _deserialize(data):
-		items = {}
-		try:
-			for item in data.decode().split("|"):
-				name,check,c_addr,p_addr = item.split(",")
-				items[name] = Item(name,check,c_addr,p_addr)
+# def _deserialize(data):
+# 		items = {}
+# 		try:
+# 			for item in data.decode().split("|"):
+# 				name,check,c_addr,p_addr = item.split(",")
+# 				items[name] = Item(name,check,c_addr,p_addr)
 
-		except ValueError:
-			pass
+# 		except ValueError:
+# 			pass
 			
-		return items
+# 		return items
 
 def _deserialize_key(data):
 	
 		for pair in data.decode().split("|"):
 			name,pubkey,prof = pair.split(",")
-			
-		return name 
+			user_profile = User_Profile(name,pubkey,prof)
+
+		return user_profile 
 		
+

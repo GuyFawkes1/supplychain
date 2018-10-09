@@ -15,6 +15,6 @@ urlpatterns = [
 	path('details/<itemname>/',views.detail,name='detail'),
 	path('details/<itemname>/checks/',views.checked , name = 'checked'),
 	path('users-details/<username>/',views.user_detail,name='user_detail'),
-	path('send/<itemname>/',views.SendItem.as_view(),name = 'send')
+	path('send/<itemname>/',views.send,name = 'send')
 
 ]

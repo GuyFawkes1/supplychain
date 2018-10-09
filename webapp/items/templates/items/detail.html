@@ -16,9 +16,26 @@
 				
 				{% for checkno,obj in checks_list.items %}
 
-					{% if obj.check %}
+					{% if forloop.counter == 1 %}
+					<h4>Manufacturing Site QA</h4>
+					{% endif %}
+					{% if forloop.counter == 5 %}
+					<br><h4>Sterilization Unit</h4>
+					{% endif %}
+					{% if forloop.counter == 7 %}
+					<br><h4>Distribution Centre - QA</h4>
+					{% endif %}
 
-					<input type="checkbox" name="check" value="{{ forloop.counter }}" /><label>{{ obj.name }}</label><br>			
+
+
+					{% if obj.check %}
+						{% if obj.auth%}
+							<input type="checkbox" name="check" value="{{ forloop.counter }}" /><label>{{ obj.name }}</label><br>			
+						{% else %}
+						<input type="checkbox" name="check" disabled="disabled" value="{{ forloop.counter }}" />
+							<label style = "color:grey">{{ obj.name }}</label><br>			
+						{% endif %}
+
 					{% else %}
 					<input type="checkbox" name="check" disabled="disabled" value="{{ forloop.counter }}" checked />
 						<label style="color:green">{{ obj.name }}</label><br>
