@@ -2,12 +2,17 @@ import hashlib
 
 from sawtooth_sdk.processor.exceptions import InternalError
 
-
+# 128-digit hexadecimal number for the first 6 digits of each transaction family is created
+# The first 6 digits from the number is extracted
+# This will correspond to the transaction family in the state adresss
 HW_NAMESPACE = hashlib.sha512('hw'.encode("utf-8")).hexdigest()[0:6]
 
 WAL_NAMESPACE = hashlib.sha512('wal'.encode("utf-8")).hexdigest()[0:6]
 
 
+# Complete state address is created 
+# Using the 6 digits corresponding to transaction family 
+# And first 64 digits from the hexadecimal number for the item or user name
 def _make_wal_address(name):
 	return WAL_NAMESPACE + \
 		hashlib.sha512(name.encode('utf-8')).hexdigest()[:64]
@@ -16,7 +21,7 @@ def _make_hw_address(name):
 	return HW_NAMESPACE + \
 		hashlib.sha512(name.encode('utf-8')).hexdigest()[:64]
 
-
+# class for the item's individual state date
 class Item(object):
 	def __init__(self,name,check,c_addr,p_addr):
 		self.name = name
@@ -24,6 +29,7 @@ class Item(object):
 		self.c_addr = c_addr
 		self.p_addr = p_addr
 
+# not item but for user 
 class Pair(object):
 	def __init__(self,name,pubkey,prof):
 		self.name = name
@@ -31,6 +37,9 @@ class Pair(object):
 		self.pubkey = pubkey
 
 
+# if any changes need 
+# receives the individual state data and either adds the new state data to the new state address
+# or replaces state data with the most current stuff 
 class HwState(object):
 	
 	TIMEOUT = 3
@@ -39,6 +48,8 @@ class HwState(object):
 		self._context = context
 		self._address_cache = {}
 
+	# items is dictionary of key value pairs - key being the address and value being the state data
+	# there may be an exception where one address has data for two things - the if else handles that
 	def delete_item(self,item_name):
 		items = self._load_items(item_name = item_name)
 
@@ -48,6 +59,7 @@ class HwState(object):
 		else:
 			self._delete_item(item_name)
 
+	# used in transhand to retrieve public key
 	def get_pubkey(self,name):
 		key_address = _make_wal_address(name)
 		key_state_entry=self._context.get_state([key_address],timeout=self.TIMEOUT)
@@ -72,7 +84,7 @@ class HwState(object):
 			print("Reciever doesn't exist in the database")
 			return None
 
-
+	# puts individual state item into state database
 	def set_item(self,item_name,item):
 		items = self._load_items(item_name= item_name)
 
@@ -80,9 +92,11 @@ class HwState(object):
 
 		self._store_item(item_name,items = items)
 
+	# retrieves individual state data from database
 	def get_item(self,item_name):
 		return self._load_items(item_name=item_name).get(item_name)
 
+	# puts back a dictionary of strings
 	def _store_item(self,item_name,items):
 
 		address = _make_hw_address(item_name)
@@ -98,6 +112,8 @@ class HwState(object):
 		self._context.delete_state([address],timeout=self.TIMEOUT)
 		self._address_cache[address] = None
 
+	# gives all of the state addresses and corresponding state data
+	# if you want to fix two things being stored at the same address 
 	def _load_items(self,item_name):
 		address = _make_hw_address(item_name)
 		if address in self._address_cache:
@@ -121,6 +137,7 @@ class HwState(object):
 
 		return items
 
+	# splits into individual components
 	def _deserialize(self,data):
 		items = {}
 		try:
@@ -149,7 +166,7 @@ class HwState(object):
 		pairs = {}
 		try:
 			for pair in data.decode().split("|"):
-				name,pubkey,profile = pair.split(",")
+				name,pubkey,profile = pair.split(",") # comma is delimiter 
 				pairs[name] = Pair(name,pubkey,profile)
 
 		except ValueError:

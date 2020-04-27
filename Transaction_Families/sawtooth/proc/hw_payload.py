@@ -1,5 +1,9 @@
 from sawtooth_sdk.processor.exceptions import InvalidTransaction
 
+# Encrypted string from the transaction is decoded
+# Individual components from the decoded string are extracted
+# Individual methods return the attribute that is called by hw_transhand.py
+
 class HwPayload(object):
 
 	def __init__(self,payload):
@@ -15,7 +19,7 @@ class HwPayload(object):
 		self._cu_add = cu_add
 		self._nxt_add = nxt_add
 		self._time_stamp = time_stamp
-
+ 
 	@staticmethod
 	def from_bytes(payload):
 		return HwPayload(payload=payload)

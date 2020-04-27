@@ -12,7 +12,7 @@ from .models import Pair
 ###WORK on this postponed
 def random_server():
 	urls_list = { '1': 'http://127.0.0.1:8008','2': 'http://rest-api-0:8008' }
-	return urls_list['1']
+	return urls_list['2']
 
 
 def index(request):

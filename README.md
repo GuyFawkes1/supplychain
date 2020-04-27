@@ -13,9 +13,11 @@ This repository contains a web app that can be hosted on your ubuntu machine tha
 * git
 * screen (optional)
 
-**Note: Docker compatibility is in works**
-
 ## Installation Procedure
+
+### Installation with Docker
+
+Make sure that you install Docker and Docker-compose(For Windows and Mac installing docker will also install docker-compose).After installing download [docker-compose.yaml](https://github.com/GuyFawkes1/supplychain/blob/webapp/docker/docker-compose.yaml) and run docker-compose up.
 
 ### Using Native Ubuntu
 
@@ -175,6 +177,8 @@ Install sawtooth and create the genisis block as described above.Then git clone 
 #### Getting rid of all the block chain data to start a new chain
 
 Navigate to /var/lib/sawtooth and delete all the files inside it. To create a new blockchain follow the same procedure as above, from starting the first validator (if you don't want to change any settings of poet else you have to start from creating the genesis block)
+
+
 
 ## Details of folders
 

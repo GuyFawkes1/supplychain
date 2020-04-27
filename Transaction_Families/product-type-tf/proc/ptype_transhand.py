@@ -2,10 +2,10 @@ import logging
 from sawtooth_sdk.processor.handler import TransactionHandler
 from sawtooth_sdk.processor.exceptions import InvalidTransaction
 from sawtooth_sdk.processor.exceptions import InternalError
-from wal_payload import WalPayload
-from wal_state import Pair
-from wal_state import WalState
-from wal_state import WAL_NAMESPACE
+from ptype_payload import PtypePayload
+from ptype_state import Pair
+from ptype_state import PtypeState
+from ptype_state import PTYPE_NAMESPACE
 import subprocess
 LOGGER = logging.getLogger(__name__)
 

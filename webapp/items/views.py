@@ -39,11 +39,11 @@ def index(request):
 		#flag to stop having the username in the html
 		#takes care of search form
 		
-	for name,item_obj in resp.items():
-		#finding out human name of the public key holder
-		nc_add = finder_wal.query(item_obj.c_addr,request.user.username,url)
-		nc_add = _deserialize_key(nc_add)
-		resp[name].c_addr = nc_add.name
+	# for name,item_obj in resp.items():
+	# 	#finding out human name of the public key holder
+	# 	nc_add = finder_wal.query(item_obj.c_addr,request.user.username,url)
+	# 	nc_add = _deserialize_key(nc_add)
+	# 	resp[name].c_addr = nc_add.name
 
 	context = {'resp' :resp, 'username' : request.user.username,'flag' : flag}
 
@@ -56,15 +56,21 @@ def detail(request,itemname):
 	url = random_server()
 
 
-	#find item uses state list 
+	#find item uses state list
+	# finding the details of itemname in the state database 
 	resp = finder_saw.find(itemname,'ubuntu',url)
 	
-	#######VERY IMPOSRTANT CHANGE TO BE APPLIED HERE TOOO
+
+	# nc_add is the human readable name
 	nc_add = finder_wal.query(resp[itemname].c_addr,'ubuntu',url)
-	user_profile = _deserialize_key(nc_add) 
+	# breaking apart the string with commas
+	user_profile = _deserialize_key(nc_add)
+
 	nc_add = user_profile.name
-	print("NC-ADD")
-	print(nc_add)
+
+
+	# finding the profile 
+
 	user_profile = finder_wal.query(nc_add,'ubuntu',url)
 	user_profile = _deserialize_key(user_profile)
 	resp[itemname].c_addr = nc_add
@@ -75,11 +81,15 @@ def detail(request,itemname):
 	#serialized make that into an item history class with all the attributes so that django 
 	#will not complain
 	#we can do the serializtion and breaking up stuff in the his.py
+
+	# looks through all the transactions to find history
 	hist= his.item_history(itemname,url)
 	requested_user = request.user.username
 	
 
+	# submit button is only shown in the current address of the item is the same as the current user of the page. 
 	context = {'resp' :resp,'hist' : hist , "checks_list" : checks_list , 'requested_user':requested_user }
+
 	return render(request,'items/detail.html',context)	
 
 def user_detail (request,username):
@@ -106,7 +116,7 @@ def user_detail (request,username):
 
 	context = {'resp' :resp,'username':username}
 
-	return render(request,'items/index.html', context)
+	return render(request,'items/user-detail.html', context)
 	
 
 
@@ -283,7 +293,6 @@ class CreateItemView(View):
 	def post(self,request):
 		
 		if request.user.is_authenticated == False :
-			print("Should not come here")
 			return redirect('items:login')
 		url = random_server()
 
@@ -294,9 +303,8 @@ class CreateItemView(View):
 
 		if user is not None:
 			response = create_saw.cr(itemname,username,url)
-			print(response)
-			#time.sleep(1.5)
 			return redirect('items:index')
+		
 		else:
 			#retry password
 			form = self.form_class(None)

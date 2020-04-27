@@ -9,7 +9,7 @@
 		
 		{% for name,g in resp.items %}
 
-			<li><a href = "{% url 'items:detail' g.name %} "> {{ g.name }}  is currently with {{ username }} </a></li><br>
+			<li><a href = "{% url 'items:detail' g.name %} "> {{ g.name }}  is currently with {{ g.c_addr }} </a></li><br>
 		{% endfor %}
 	</ul>
 	</div>
